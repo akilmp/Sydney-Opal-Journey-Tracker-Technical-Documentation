@@ -338,6 +338,9 @@ ENABLE_METRICS=false
 # Jobs
 CRON_ENABLE=true
 GTFS_REFRESH_CRON=0 3 * * *
+
+# Seeding
+SEED_WITH_FAKE_TRIPS=false
 ```
 
 ---
@@ -363,7 +366,8 @@ docker compose up -d
 pnpm prisma migrate dev --name init
 
 # 4) Seed with sample data (optional)
-pnpm tsx scripts/seed.ts
+pnpm seed
+#    set SEED_WITH_FAKE_TRIPS=true to generate sample trips
 
 # 5) Run the app
 pnpm dev
@@ -389,8 +393,8 @@ volumes:
 
 ### Seeding
 
-* Creates one demo user, a couple of trips, and saved stops.
-* Use environment variable `SEED_WITH_FAKE_TRIPS=true` to include synthetic rows.
+* Creates one demo user and two saved stops.
+* Set `SEED_WITH_FAKE_TRIPS=true` to also insert synthetic trips.
 
 ---
 
