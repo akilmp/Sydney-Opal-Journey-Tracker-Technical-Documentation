@@ -481,6 +481,8 @@ pnpm test:coverage       # coverage report
   * Install, type‑check, lint, test.
   * Build Next.js.
   * On `main` merge: deploy to Vercel; run DB migrations.
+  * Configure repository secrets: `NEXTAUTH_SECRET`, `DATABASE_URL`,
+    `TFNSW_API_KEY`, `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`.
 
 ```yaml
 name: ci
