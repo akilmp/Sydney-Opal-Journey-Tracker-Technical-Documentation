@@ -1,13 +1,20 @@
 {
-  "name": "sydney-opal-journey-tracker",
+  "name": "sydney-opal-journey-tracker-technical-documentation",
   "version": "1.0.0",
-  "private": true,
+  "description": "A personal commute companion for Sydney that ingests your Opal activity statements, visualises spend/time trends, and overlays live departures and disruption alerts for the stops and lines you actually use.",
   "type": "module",
   "scripts": {
-    "test": "echo \"No tests\""
+    "seed": "tsx scripts/seed.ts",
+    "test": "echo 'no tests'"
   },
   "dependencies": {
-    "inngest": "^1.0.0",
-    "ioredis": "^5.4.0"
+    "pg": "^8.16.3"
+  },
+  "devDependencies": {
+    "@types/node": "^24.3.0",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.20.5",
+    "typescript": "^5.9.2"
+
   }
 }

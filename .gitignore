@@ -1,3 +1,6 @@
-node_modules
-packages/*/node_modules
+node_modules/
+.env
 
+# build artifacts
+/dist
+build/
