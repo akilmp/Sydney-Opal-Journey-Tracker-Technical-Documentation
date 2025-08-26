@@ -1,0 +1,95 @@
+// Prisma schema for Sydney Opal Journey Tracker
+// Generated to model users, profiles, opal uploads, trips and related tables
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id             String           @id @default(uuid())
+  email          String           @unique
+  createdAt      DateTime         @default(now())
+  tz             String?
+  profile        Profile?
+  uploads        OpalUpload[]
+  trips          Trip[]
+  commuteWindows CommuteWindow[]
+  favourites     Favourite[]
+  settings       Setting?
+}
+
+model Profile {
+  user        User   @relation(fields: [userId], references: [id])
+  userId      String @id
+  homeStopId  String?
+  workStopId  String?
+  defaultLines String[]
+}
+
+model OpalUpload {
+  id         String   @id @default(uuid())
+  user       User     @relation(fields: [userId], references: [id])
+  userId     String
+  filename   String
+  mime       String
+  status     String
+  rowsParsed Int
+  uploadedAt DateTime @default(now())
+}
+
+model Trip {
+  id           String   @id @default(uuid())
+  user         User     @relation(fields: [userId], references: [id])
+  userId       String
+  tapOnTime    DateTime?   @db.Timestamptz(6)
+  tapOffTime   DateTime?   @db.Timestamptz(6)
+  mode         String?
+  line         String?
+  originName   String?
+  originStopId String?
+  destName     String?
+  destStopId   String?
+  fareCents    Int?
+  defaultFare  Boolean  @default(false)
+  distanceKm   Decimal? @db.Decimal(10,2)
+  notes        String?
+  tags         String[]
+  source       String?
+}
+
+model CommuteWindow {
+  id        String   @id @default(uuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  weekday   Int
+  startTime DateTime @db.Time
+  endTime   DateTime @db.Time
+}
+
+model Favourite {
+  id      String @id @default(uuid())
+  user    User   @relation(fields: [userId], references: [id])
+  userId  String
+  stopId  String?
+  routeId String?
+}
+
+model RealtimeSnapshot {
+  id         String   @id @default(uuid())
+  stopId     String
+  capturedAt DateTime @db.Timestamptz(6)
+  payload    Json
+}
+
+model Setting {
+  user         User    @relation(fields: [userId], references: [id])
+  userId       String  @id
+  privacyOptOut Boolean @default(false)
+  metricsOptIn  Boolean @default(false)
+}
+
