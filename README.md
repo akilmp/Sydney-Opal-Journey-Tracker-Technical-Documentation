@@ -400,9 +400,10 @@ volumes:
 
 ## Background Jobs & Caching
 
-* **Upload parsing**: Enqueued on `/opal/parse/:uploadId`; processes in background to keep UI snappy.
-* **Realtime cache**: 10–30s TTL per stop to avoid hammering APIs; keyed by `stopId`.
-* **GTFS static refresh**: Nightly download; store version and hash; invalidate inference caches.
+* **Job runner**: [Inngest](https://www.inngest.com/) functions live in `apps/web/src/jobs` and orchestrate async work.
+* **Upload parsing**: `parseStatements` consumes `statements/uploaded` events and writes transactions without blocking uploads.
+* **GTFS static refresh**: `refreshGtfs` runs nightly to pull new bundles and clear transit caches.
+* **Realtime cache**: `apps/web/src/utils/cache` exposes Redis or in‑memory caches with 10–30s TTLs per stop.
 * **Circuit breaker**: If Transport NSW is erroring, serve last good snapshot and display a banner.
 
 ---
@@ -484,6 +485,8 @@ pnpm test:coverage       # coverage report
   * Install, type‑check, lint, test.
   * Build Next.js.
   * On `main` merge: deploy to Vercel; run DB migrations.
+  * Configure repository secrets: `NEXTAUTH_SECRET`, `DATABASE_URL`,
+    `TFNSW_API_KEY`, `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`.
 
 ```yaml
 name: ci

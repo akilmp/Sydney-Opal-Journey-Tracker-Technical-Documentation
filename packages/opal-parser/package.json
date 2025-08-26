@@ -1,0 +1,16 @@
+{
+  "name": "opal-parser",
+  "version": "1.0.0",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "dependencies": {
+    "csv-parse": "^5.5.3",
+    "cheerio": "^1.0.0-rc.12",
+    "luxon": "^3.4.4"
+  },
+  "devDependencies": {
+    "jest": "^29.6.0"
+  }
+}
