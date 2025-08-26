@@ -1,0 +1,13 @@
+{
+  "name": "sydney-opal-journey-tracker",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "echo \"No tests\""
+  },
+  "dependencies": {
+    "inngest": "^1.0.0",
+    "ioredis": "^5.4.0"
+  }
+}
