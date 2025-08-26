@@ -34,7 +34,6 @@ A personal commute companion for Sydney that ingests your Opal activity statemen
 * [Roadmap](#roadmap)
 * [Troubleshooting](#troubleshooting)
 * [FAQs](#faqs)
-* [License & Attribution](#license--attribution)
 
 ---
 
