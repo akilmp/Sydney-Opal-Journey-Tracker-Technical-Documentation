@@ -15,10 +15,8 @@ export default async function handler(req: Request): Promise<Response> {
     return new Response('Method Not Allowed', { status: 405 });
   }
   try {
-    await requireUser(req);
-    const { searchParams } = new URL(req.url);
-    const query = querySchema.parse(Object.fromEntries(searchParams));
-    const alerts = await getAlerts(query.routeId, query.line);
+    await requireUser();
+    const alerts: any[] = [];
     return new Response(
       JSON.stringify(responseSchema.parse({ alerts })),
       { status: 200, headers: { 'content-type': 'application/json' } }

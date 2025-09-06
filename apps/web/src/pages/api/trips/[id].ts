@@ -22,7 +22,7 @@ export default async function handler(req: Request): Promise<Response> {
     return new Response('Method Not Allowed', { status: 405 });
   }
   try {
-    const user = await requireUser(req);
+    await requireUser();
     const id = new URL(req.url).pathname.split('/').pop() || '';
     paramsSchema.parse({ id });
     const body = bodySchema.parse(await req.json());
