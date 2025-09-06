@@ -1,9 +1,13 @@
 import { z } from 'zod';
 import { requireUser } from '../../../lib/auth';
+import { getDepartures } from '../../../lib/transportNSW';
 
 export const config = { runtime: 'edge' };
 
-const querySchema = z.object({ stopId: z.string() });
+const querySchema = z.object({
+  stopId: z.string(),
+  limit: z.coerce.number().optional(),
+});
 const responseSchema = z.object({ departures: z.array(z.any()) });
 
 export default async function handler(req: Request): Promise<Response> {
@@ -14,14 +18,21 @@ export default async function handler(req: Request): Promise<Response> {
     await requireUser();
     const { searchParams } = new URL(req.url);
     const query = querySchema.parse(Object.fromEntries(searchParams));
-    const departures: any[] = [];
+    const departures = await getDepartures(query.stopId, query.limit);
     return new Response(
       JSON.stringify(responseSchema.parse({ departures })),
       { status: 200, headers: { 'content-type': 'application/json' } }
     );
   } catch (err: any) {
-    return err instanceof Response
-      ? err
-      : new Response('Bad Request', { status: 400 });
+    if (err instanceof Response) return err;
+    const status =
+      typeof err.message === 'string' &&
+      (err.message.includes('Transport NSW') ||
+        err.message.includes('circuit breaker'))
+        ? 503
+        : 400;
+    return new Response(status === 503 ? 'Service Unavailable' : 'Bad Request', {
+      status,
+    });
   }
 }
