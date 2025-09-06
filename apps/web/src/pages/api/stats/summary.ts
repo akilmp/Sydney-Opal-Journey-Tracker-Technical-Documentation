@@ -10,7 +10,7 @@ export default async function handler(req: Request): Promise<Response> {
     return new Response('Method Not Allowed', { status: 405 });
   }
   try {
-    await requireUser(req);
+    await requireUser();
     const stats = { trips: 0, distance: 0 };
     return new Response(
       JSON.stringify(responseSchema.parse(stats)),

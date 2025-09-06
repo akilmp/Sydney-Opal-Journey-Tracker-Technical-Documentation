@@ -11,7 +11,7 @@ export default async function handler(req: Request): Promise<Response> {
     return new Response('Method Not Allowed', { status: 405 });
   }
   try {
-    await requireUser(req);
+    await requireUser();
     const { searchParams, pathname } = new URL(req.url);
     const uploadId = pathname.split('/').pop() || '';
     paramsSchema.parse({ uploadId });

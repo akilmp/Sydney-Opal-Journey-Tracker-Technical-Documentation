@@ -11,7 +11,7 @@ export default async function handler(req: Request): Promise<Response> {
     return new Response('Method Not Allowed', { status: 405 });
   }
   try {
-    const user = await requireUser(req);
+    const user = await requireUser();
     const { searchParams } = new URL(req.url);
     const query = querySchema.parse(Object.fromEntries(searchParams));
     const trips: any[] = [];

@@ -11,7 +11,7 @@ export default async function handler(req: Request): Promise<Response> {
     return new Response('Method Not Allowed', { status: 405 });
   }
   try {
-    const user = await requireUser(req);
+    const user = await requireUser();
     const body = bodySchema.parse(await req.json());
     const uploadId = `${user.id}-${Date.now()}`;
     return new Response(

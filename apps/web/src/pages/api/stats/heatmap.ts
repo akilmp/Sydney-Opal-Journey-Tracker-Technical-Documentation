@@ -14,7 +14,7 @@ export default async function handler(req: Request): Promise<Response> {
     return new Response('Method Not Allowed', { status: 405 });
   }
   try {
-    await requireUser(req);
+    await requireUser();
     const points: any[] = [];
     return new Response(
       JSON.stringify(responseSchema.parse({ points })),
