@@ -17,17 +17,17 @@ async function main() {
     [userId, 'demo@example.com']
   );
 
-  const stops: Array<{ stopId: string; nickname: string }> = [
-    { stopId: '214748', nickname: 'Home' },
-    { stopId: '214749', nickname: 'Work' },
+  const favourites: Array<{ stopId?: string; routeId?: string }> = [
+    { stopId: '214748' },
+    { stopId: '214749' },
   ];
 
-  for (const stop of stops) {
+  for (const fav of favourites) {
     await client.query(
-      `INSERT INTO saved_stops (user_id, stop_id, nickname)
+      `INSERT INTO favourites (user_id, stop_id, route_id)
        VALUES ($1, $2, $3)
        ON CONFLICT DO NOTHING`,
-      [userId, stop.stopId, stop.nickname]
+      [userId, fav.stopId ?? null, fav.routeId ?? null]
     );
   }
 
@@ -41,8 +41,8 @@ async function main() {
          VALUES ($1, $2, $3, $4, $5, $6, $7)`,
         [
           userId,
-          stops[0].stopId,
-          stops[1].stopId,
+          favourites[0].stopId,
+          favourites[1].stopId,
           'train',
           start.toISOString(),
           end.toISOString(),
