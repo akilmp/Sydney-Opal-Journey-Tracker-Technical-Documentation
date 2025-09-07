@@ -1,4 +1,10 @@
 import { describe, it, expect } from 'vitest';
+
+vi.mock('../../../lib/transportNSW', () => ({
+  getAlerts: vi.fn().mockResolvedValue([]),
+  getDepartures: vi.fn().mockResolvedValue([]),
+}));
+
 import alertsHandler from '../live/alerts';
 import departuresHandler from '../live/departures';
 
