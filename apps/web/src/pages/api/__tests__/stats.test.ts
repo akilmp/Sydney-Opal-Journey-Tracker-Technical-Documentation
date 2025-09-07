@@ -23,7 +23,7 @@ describe('GET /api/stats/summary', () => {
     });
     const res = await summaryHandler(req);
     expect(res.status).toBe(200);
-    expect(await res.json()).toEqual({ trips: 0, distance: 0 });
+    expect(await res.json()).toEqual({ trips: 0, distance: 0, fare: 0 });
   });
 });
 
