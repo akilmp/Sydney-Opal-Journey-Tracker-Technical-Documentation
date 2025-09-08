@@ -15,8 +15,26 @@ export default async function handler(req: Request): Promise<Response> {
     return new Response('Method Not Allowed', { status: 405 });
   }
   try {
-      await requireUser(req);
-    const points: any[] = [];
+    const user = await requireUser(req);
+    const trips = (await prisma.trip.findMany({
+      where: { userId: user.id },
+    })) as any[];
+
+    const map = new Map<string, { lat: number; lng: number; weight: number }>();
+    for (const t of trips) {
+      const coords = [
+        [t.originLat, t.originLng],
+        [t.destLat, t.destLng],
+      ];
+      for (const [lat, lng] of coords) {
+        if (typeof lat !== 'number' || typeof lng !== 'number') continue;
+        const key = `${lat},${lng}`;
+        const existing = map.get(key);
+        if (existing) existing.weight += 1;
+        else map.set(key, { lat, lng, weight: 1 });
+      }
+    }
+    const points = Array.from(map.values());
 
     return new Response(
       JSON.stringify(responseSchema.parse({ points })),
