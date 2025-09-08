@@ -18,6 +18,7 @@ export default async function handler(req: Request): Promise<Response> {
       await requireUser(req);
     const stats = { trips: 0, distance: 0, fare: 0 };
 
+
     return new Response(
       JSON.stringify(responseSchema.parse(stats)),
       { status: 200, headers: { 'content-type': 'application/json' } }

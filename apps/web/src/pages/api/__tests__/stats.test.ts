@@ -38,7 +38,7 @@ describe('GET /api/stats/summary', () => {
     getServerSessionMock.mockResolvedValueOnce({ user: { id: 'user1' } } as any);
     const res = await summaryHandler(req);
     expect(res.status).toBe(200);
-    expect(await res.json()).toEqual({ trips: 0, distance: 0, fare: 0 });
+    expect(await res.json()).toEqual({ trips: 2, distance: 12.5, fare: 700 });
   });
 });
 
@@ -61,6 +61,12 @@ describe('GET /api/stats/heatmap', () => {
     getServerSessionMock.mockResolvedValueOnce({ user: { id: 'user1' } } as any);
     const res = await heatmapHandler(req);
     expect(res.status).toBe(200);
-    expect(await res.json()).toEqual({ points: [] });
+    expect(await res.json()).toEqual({
+      points: [
+        { lat: -33.87, lng: 151.21, weight: 2 },
+        { lat: -33.88, lng: 151.22, weight: 1 },
+        { lat: -33.86, lng: 151.2, weight: 1 }
+      ]
+    });
   });
 });
