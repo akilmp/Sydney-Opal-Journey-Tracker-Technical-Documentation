@@ -15,8 +15,8 @@ export default async function handler(req: Request): Promise<Response> {
     return new Response('Method Not Allowed', { status: 405 });
   }
   try {
-      await requireUser(req);
-    const stats = { trips: 0, distance: 0 };
+    await requireUser(req);
+    const stats = { trips: 0, distance: 0, fare: 0 };
 
     return new Response(
       JSON.stringify(responseSchema.parse(stats)),
