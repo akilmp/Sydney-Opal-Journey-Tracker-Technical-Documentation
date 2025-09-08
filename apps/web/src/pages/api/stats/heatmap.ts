@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { requireUser } from '../../../lib/auth';
+import { prisma } from '../../../lib/prisma';
 
 export const config = { runtime: 'edge' };
 
@@ -16,6 +17,7 @@ export default async function handler(req: Request): Promise<Response> {
   try {
       await requireUser(req);
     const points: any[] = [];
+
     return new Response(
       JSON.stringify(responseSchema.parse({ points })),
       { status: 200, headers: { 'content-type': 'application/json' } }
