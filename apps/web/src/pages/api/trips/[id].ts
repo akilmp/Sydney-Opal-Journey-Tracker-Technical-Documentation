@@ -22,13 +22,13 @@ export default async function handler(req: Request): Promise<Response> {
     return new Response('Method Not Allowed', { status: 405 });
   }
   try {
-    await requireUser();
+    const user = await requireUser(req);
     const id = new URL(req.url).pathname.split('/').pop() || '';
     paramsSchema.parse({ id });
     const body = bodySchema.parse(await req.json());
 
-    const existing = await prisma.trip.findUnique({ where: { id } });
-    if (!existing || existing.userId !== user.id) {
+    const existing = await prisma.trip.findFirst({ where: { id, userId: user.id } });
+    if (!existing) {
       return new Response('Not Found', { status: 404 });
     }
 
