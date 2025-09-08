@@ -15,8 +15,18 @@ export default async function handler(req: Request): Promise<Response> {
     return new Response('Method Not Allowed', { status: 405 });
   }
   try {
-      await requireUser(req);
-    const stats = { trips: 0, distance: 0 };
+    const user = await requireUser(req);
+    const { _count, _sum } = await prisma.trip.aggregate({
+      where: { userId: user.id },
+      _count: { _all: true },
+      _sum: { distanceKm: true, fareCents: true },
+    });
+
+    const stats = {
+      trips: _count._all,
+      distance: Number(_sum.distanceKm ?? 0),
+      fare: _sum.fareCents ?? 0,
+    };
 
     return new Response(
       JSON.stringify(responseSchema.parse(stats)),
