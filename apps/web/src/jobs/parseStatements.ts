@@ -1,5 +1,8 @@
 import { inngest } from "./client";
 import { cache } from "../utils/cache";
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
 
 /**
  * Job: parse uploaded statement files and persist transactions to the DB.
@@ -9,27 +12,56 @@ export const parseStatements = inngest.createFunction(
   { id: "parse-uploaded-statements" },
   { event: "statements/uploaded" },
   async ({ event, step }) => {
-    const { fileUrl } = event.data;
+    const { fileUrl, uploadId, userId, type } = event.data as {
+      fileUrl: string;
+      uploadId: string;
+      userId: string;
+      type: "csv" | "html";
+    };
 
-    // Download the raw statement file
-    const raw = await step.run("download", () => fetch(fileUrl).then(r => r.text()));
+    try {
+      // Download the raw statement file
+      const raw = await step.run("download", () => fetch(fileUrl).then(r => r.text()));
 
-    // Parse each line into a statement record
-    const lines = raw.split("\n").filter(Boolean);
-    const records = lines.map(line => {
-      const [date, description, amount] = line.split(",");
-      return { date, description, amount: Number(amount) };
-    });
+      // Parse the file using the shared opal parser
+      const parser = await import("../../../../packages/opal-parser/src");
+      const parseFn = type === "html" ? parser.parseHTML : parser.parseCSV;
+      const { records } = parseFn(raw, {});
 
-    // Persist parsed records to the database (placeholder)
-    await step.run("save", async () => {
-      // replace with real DB logic
-      console.log(`saving ${records.length} records`);
-    });
+      // Persist parsed trips and update upload status
+      await step.run("persist", async () => {
+        if (records.length) {
+          await prisma.trip.createMany({
+            data: records.map((r: any) => ({
+              userId,
+              tapOnTime: r.tap_on_time ? new Date(r.tap_on_time) : null,
+              tapOffTime: r.tap_off_time ? new Date(r.tap_off_time) : null,
+              mode: r.line || null,
+              line: r.line || null,
+              originName: r.from_stop || null,
+              destName: r.to_stop || null,
+              fareCents: r.fare_cents ?? null,
+              defaultFare: r.is_default_fare ?? false,
+              source: uploadId,
+            })),
+          });
+        }
 
-    // Invalidate related caches
-    await cache.clear("statements");
+        await prisma.opalUpload.update({
+          where: { id: uploadId },
+          data: { status: "parsed", rowsParsed: records.length },
+        });
+      });
 
-    return { parsed: records.length };
+      // Invalidate caches only after successful persistence
+      await cache.clear("statements");
+
+      return { parsed: records.length };
+    } catch (err) {
+      await prisma.opalUpload
+        .update({ where: { id: uploadId }, data: { status: "error" } })
+        .catch(() => undefined);
+      throw err;
+    }
   }
 );
