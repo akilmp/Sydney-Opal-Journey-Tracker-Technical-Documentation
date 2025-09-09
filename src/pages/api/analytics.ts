@@ -14,25 +14,24 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(403).json({ error: 'Forbidden' });
   }
 
-  const settings = await prisma.settings.findUnique({
-    where: { user_id: session.user.id },
+  const settings = await prisma.setting.findUnique({
+    where: { userId: session.user.id },
   });
 
-  if (!settings?.collect_metrics) {
+  if (!settings?.collectMetrics) {
     return res.status(204).end();
   }
 
-  const stats = await prisma.trips.aggregate({
-    where: { user_id: session.user.id },
-    _sum: { fare: true, duration_minutes: true },
+  const stats = await prisma.trip.aggregate({
+    where: { userId: session.user.id },
+    _sum: { fareCents: true },
   });
 
-  if (settings.share_anonymized_metrics) {
+  if (settings.shareAnonymizedMetrics) {
     // placeholder for sending anonymized metrics to an external collector
   }
 
   return res.status(200).json({
-    totalFare: stats._sum.fare ?? 0,
-    totalMinutes: stats._sum.duration_minutes ?? 0,
+    totalFareCents: stats._sum.fareCents ?? 0,
   });
 }
