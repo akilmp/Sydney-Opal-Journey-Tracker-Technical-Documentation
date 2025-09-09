@@ -87,9 +87,11 @@ model RealtimeSnapshot {
 }
 
 model Setting {
-  user         User    @relation(fields: [userId], references: [id])
-  userId       String  @id
-  privacyOptOut Boolean @default(false)
-  metricsOptIn  Boolean @default(false)
+  user                   User    @relation(fields: [userId], references: [id])
+  userId                 String  @id @map("user_id")
+  collectMetrics         Boolean @default(true) @map("collect_metrics")
+  shareAnonymizedMetrics Boolean @default(true) @map("share_anonymized_metrics")
+
+  @@map("settings")
 }
 
