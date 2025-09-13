@@ -18,6 +18,7 @@ export default function DashboardPage() {
         <div>
           <p>Trips: {data.trips}</p>
           <p>Distance: {data.distance}</p>
+          <p>Fare: {data.fare}</p>
         </div>
       )}
     </div>
