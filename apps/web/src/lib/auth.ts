@@ -5,8 +5,8 @@ export interface User {
   id: string;
 }
 
-export async function requireUser(_req: Request): Promise<User> {
-  const session = await getServerSession(authOptions);
+export async function requireUser(req: Request): Promise<User> {
+  const session = await getServerSession(req, { ...authOptions });
   const id = session?.user?.id as string | undefined;
   if (!id) {
     throw new Response('Unauthorized', { status: 401 });
