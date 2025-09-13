@@ -16,6 +16,7 @@ vi.mock('../../../lib/prisma', () => ({
 }));
 
 import { getServerSession } from 'next-auth';
+
 import summaryHandler from '../stats/summary';
 import heatmapHandler from '../stats/heatmap';
 

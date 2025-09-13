@@ -33,6 +33,7 @@ export default async function handler(req: Request): Promise<Response> {
     await inngest.send({
       name: 'statements/uploaded',
       data: { fileUrl, uploadId, userId: user.id, type: body.type },
+
     });
 
     return new Response(
