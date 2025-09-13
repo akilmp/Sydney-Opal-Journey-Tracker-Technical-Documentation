@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { requireUser } from '../../../lib/auth';
 import { getDepartures } from '../../../lib/transportNSW';
 
-export const config = { runtime: 'edge' };
+export const config = { runtime: 'nodejs' };
 
 const querySchema = z.object({
   stopId: z.string(),

@@ -4,7 +4,7 @@ import { PrismaClient } from '@prisma/client';
 import { presignDownload } from '../../../../lib/storage';
 import { inngest } from '../../../../jobs';
 
-export const config = { runtime: 'edge' };
+export const config = { runtime: 'nodejs' };
 
 const prisma = new PrismaClient();
 
