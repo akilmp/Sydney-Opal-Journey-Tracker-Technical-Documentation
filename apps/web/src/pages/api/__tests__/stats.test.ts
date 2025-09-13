@@ -11,6 +11,10 @@ vi.mock('../../../lib/prisma', () => ({
   prisma: {
     trip: {
       findMany: vi.fn().mockResolvedValue([]),
+      aggregate: vi.fn().mockResolvedValue({
+        _count: { _all: 0 },
+        _sum: { distanceKm: 0, fareCents: 0 },
+      }),
     },
   },
 }));
