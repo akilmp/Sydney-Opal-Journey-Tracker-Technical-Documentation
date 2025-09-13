@@ -24,7 +24,7 @@ export const parseStatements = inngest.createFunction(
       const raw = await step.run("download", () => fetch(fileUrl).then(r => r.text()));
 
       // Parse the file using the shared opal parser
-      const parser = await import("../../../../packages/opal-parser/src");
+      const parser = await import("opal-parser");
       const parseFn = type === "html" ? parser.parseHTML : parser.parseCSV;
       const { records } = parseFn(raw, {});
 
@@ -36,7 +36,7 @@ export const parseStatements = inngest.createFunction(
               userId,
               tapOnTime: r.tap_on_time ? new Date(r.tap_on_time) : null,
               tapOffTime: r.tap_off_time ? new Date(r.tap_off_time) : null,
-              mode: r.line || null,
+              mode: r.mode || null,
               line: r.line || null,
               originName: r.from_stop || null,
               originLat: r.from_lat ?? null,
