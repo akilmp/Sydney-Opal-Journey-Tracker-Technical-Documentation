@@ -76,7 +76,8 @@ function normalizeRow(row, zone) {
   const fare = parseFare(row.fare_cents || row.fare || row['Fare']);
   const fromStop = row.from_stop || row.from || row['From Stop'] || row['From'] || '';
   const toStop = row.to_stop || row.to || row['To Stop'] || row['To'] || '';
-  const line = inferLine(row.mode || row['Mode'] || '', fromStop, toStop);
+  const mode = row.mode || row['Mode'] || '';
+  const line = inferLine(mode, fromStop, toStop);
 
   const fromCoords = STOP_COORDS[fromStop] || {};
   const toCoords = STOP_COORDS[toStop] || {};
@@ -88,6 +89,7 @@ function normalizeRow(row, zone) {
     is_default_fare: fare.default,
     from_stop: fromStop,
     to_stop: toStop,
+    mode,
     line,
     from_lat: fromCoords.lat ?? null,
     from_lng: fromCoords.lng ?? null,

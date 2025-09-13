@@ -44,7 +44,11 @@ describe('parseStatements job', () => {
     });
 
     expect(fetch).toHaveBeenCalledWith('http://example.com/file.csv');
-    expect(createMany).toHaveBeenCalledTimes(1);
+    expect(createMany).toHaveBeenCalledWith({
+      data: [
+        expect.objectContaining({ mode: 'Train', line: 'train' })
+      ]
+    });
     expect(uploadUpdate).toHaveBeenCalledWith({
       where: { id: 'u1' },
       data: { status: 'parsed', rowsParsed: 1 }

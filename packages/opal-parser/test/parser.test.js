@@ -12,6 +12,8 @@ describe('opal parser', () => {
     expect(records[0].tap_on_time.endsWith('+11:00')).toBe(true); // before DST end
     expect(records[1].tap_on_time.endsWith('+10:00')).toBe(true); // after DST end
     expect(records[1].is_default_fare).toBe(true);
+    expect(records[0]).toMatchObject({ mode: 'Train', line: 'train' });
+    expect(records[1]).toMatchObject({ mode: 'Bus', line: 'bus' });
     const messages = warnings.map(w => w.message);
     expect(messages).toContain('missing tap off');
     expect(messages).toContain('default fare charged');
@@ -27,6 +29,8 @@ describe('opal parser', () => {
 
     const { records, warnings } = parseHTML(html);
     expect(records).toHaveLength(2);
+    expect(records[0]).toMatchObject({ mode: 'Train', line: 'train' });
+    expect(records[1]).toMatchObject({ mode: 'Bus', line: 'bus' });
     expect(warnings.length).toBe(2);
   });
 });
