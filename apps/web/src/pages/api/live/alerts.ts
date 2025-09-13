@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { requireUser } from '../../../lib/auth';
 import { getAlerts } from '../../../lib/transportNSW';
 
-export const config = { runtime: 'edge' };
+export const config = { runtime: 'nodejs' };
 
 const querySchema = z.object({
   routeId: z.string(),

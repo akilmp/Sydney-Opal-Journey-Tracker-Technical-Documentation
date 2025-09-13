@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { requireUser } from '../../../lib/auth';
 import { prisma } from '../../../lib/prisma';
 
-export const config = { runtime: 'edge' };
+export const config = { runtime: 'nodejs' };
 
 const responseSchema = z.object({
   points: z.array(
