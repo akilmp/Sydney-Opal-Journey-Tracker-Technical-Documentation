@@ -7,6 +7,13 @@ vi.mock('next-auth', () => ({
 vi.mock('next-auth/providers/email', () => ({ default: () => ({}) }), { virtual: true });
 vi.mock('next-auth/providers/google', () => ({ default: () => ({}) }), { virtual: true });
 
+vi.mock('next-auth', () => ({
+  default: () => ({}),
+  getServerSession: vi.fn(),
+}), { virtual: true });
+vi.mock('next-auth/providers/email', () => ({ default: () => ({}) }), { virtual: true });
+vi.mock('next-auth/providers/google', () => ({ default: () => ({}) }), { virtual: true });
+
 vi.mock('../../../lib/transportNSW', () => ({
   getAlerts: vi.fn().mockResolvedValue([]),
   getDepartures: vi.fn().mockResolvedValue([]),

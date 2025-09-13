@@ -1,6 +1,12 @@
 const { parse } = require('csv-parse/sync');
 const { DateTime } = require('luxon');
 
+const STOP_COORDS = {
+  'Central': { lat: -33.87, lng: 151.21 },
+  'Town Hall': { lat: -33.88, lng: 151.22 },
+  'Wynyard': { lat: -33.86, lng: 151.2 },
+};
+
 function parseCSV(csv, options = {}) {
   const rows = parse(csv, { columns: true, trim: true, skip_empty_lines: true });
   return processRows(rows, options);
@@ -72,6 +78,9 @@ function normalizeRow(row, zone) {
   const toStop = row.to_stop || row.to || row['To Stop'] || row['To'] || '';
   const line = inferLine(row.mode || row['Mode'] || '', fromStop, toStop);
 
+  const fromCoords = STOP_COORDS[fromStop] || {};
+  const toCoords = STOP_COORDS[toStop] || {};
+
   return {
     tap_on_time: tapOn,
     tap_off_time: tapOff,
@@ -79,7 +88,11 @@ function normalizeRow(row, zone) {
     is_default_fare: fare.default,
     from_stop: fromStop,
     to_stop: toStop,
-    line
+    line,
+    from_lat: fromCoords.lat ?? null,
+    from_lng: fromCoords.lng ?? null,
+    to_lat: toCoords.lat ?? null,
+    to_lng: toCoords.lng ?? null,
   };
 }
 

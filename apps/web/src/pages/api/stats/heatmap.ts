@@ -16,9 +16,10 @@ export default async function handler(req: Request): Promise<Response> {
   }
   try {
     const user = await requireUser(req);
-    const trips = (await prisma.trip.findMany({
+    const trips = await prisma.trip.findMany({
       where: { userId: user.id },
-    })) as any[];
+      select: { originLat: true, originLng: true, destLat: true, destLng: true },
+    });
 
     const map = new Map<string, { lat: number; lng: number; weight: number }>();
     for (const t of trips) {

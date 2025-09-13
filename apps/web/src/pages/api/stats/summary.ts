@@ -16,16 +16,16 @@ export default async function handler(req: Request): Promise<Response> {
   }
   try {
     const user = await requireUser(req);
-    const aggregation = await prisma.trip.aggregate({
+    const agg = await prisma.trip.aggregate({
+
       where: { userId: user.id },
       _count: { _all: true },
       _sum: { distanceKm: true, fareCents: true },
     });
-
     const stats = {
-      trips: aggregation._count._all ?? 0,
-      distance: Number(aggregation._sum.distanceKm ?? 0),
-      fare: aggregation._sum.fareCents ?? 0,
+      trips: agg._count._all ?? 0,
+      distance: Number(agg._sum.distanceKm) || 0,
+      fare: agg._sum.fareCents ?? 0,
     };
 
     return new Response(

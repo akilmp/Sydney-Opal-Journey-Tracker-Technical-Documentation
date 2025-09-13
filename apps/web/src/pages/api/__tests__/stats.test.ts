@@ -7,49 +7,22 @@ vi.mock('next-auth', () => ({
 vi.mock('next-auth/providers/email', () => ({ default: () => ({}) }), { virtual: true });
 vi.mock('next-auth/providers/google', () => ({ default: () => ({}) }), { virtual: true });
 
-vi.mock('../../../lib/prisma', () => {
-  const trips = [
-    {
-      userId: 'user1',
-      distanceKm: 5,
-      fareCents: 300,
-      originLat: -33.87,
-      originLng: 151.21,
-      destLat: -33.88,
-      destLng: 151.22,
+vi.mock('../../../lib/prisma', () => ({
+  prisma: {
+    trip: {
+      aggregate: vi.fn().mockResolvedValue({
+        _count: { _all: 2 },
+        _sum: { distanceKm: 12.5, fareCents: 700 }
+      }),
+      findMany: vi.fn().mockResolvedValue([
+        { originLat: -33.87, originLng: 151.21, destLat: -33.88, destLng: 151.22 },
+        { originLat: -33.87, originLng: 151.21, destLat: -33.86, destLng: 151.2 }
+      ]),
     },
-    {
-      userId: 'user1',
-      distanceKm: 7.5,
-      fareCents: 400,
-      originLat: -33.87,
-      originLng: 151.21,
-      destLat: -33.86,
-      destLng: 151.2,
-    },
-  ];
+  },
+}));
 
-  return {
-    prisma: {
-      trip: {
-        aggregate: vi.fn(async ({ where }: any) => {
-          const userTrips = trips.filter((t) => t.userId === where.userId);
-          const distance = userTrips.reduce((sum, t) => sum + (t.distanceKm ?? 0), 0);
-          const fare = userTrips.reduce((sum, t) => sum + (t.fareCents ?? 0), 0);
-          return {
-            _count: { _all: userTrips.length },
-            _sum: { distanceKm: distance, fareCents: fare },
-          };
-        }),
-        findMany: vi.fn(async ({ where }: any) =>
-          trips.filter((t) => t.userId === where.userId)
-        ),
-      },
-    },
-  };
-});
-
-import { getServerSession } from 'next-auth';
+ServerSession } from 'next-auth';
 import summaryHandler from '../stats/summary';
 import heatmapHandler from '../stats/heatmap';
 
