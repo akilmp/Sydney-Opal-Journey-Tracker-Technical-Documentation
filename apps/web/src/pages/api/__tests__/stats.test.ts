@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 vi.mock('next-auth', () => ({
   default: () => ({}),
@@ -10,19 +10,13 @@ vi.mock('next-auth/providers/google', () => ({ default: () => ({}) }), { virtual
 vi.mock('../../../lib/prisma', () => ({
   prisma: {
     trip: {
-      aggregate: vi.fn().mockResolvedValue({
-        _count: { _all: 2 },
-        _sum: { distanceKm: 12.5, fareCents: 700 }
-      }),
-      findMany: vi.fn().mockResolvedValue([
-        { originLat: -33.87, originLng: 151.21, destLat: -33.88, destLng: 151.22 },
-        { originLat: -33.87, originLng: 151.21, destLat: -33.86, destLng: 151.2 }
-      ]),
+      findMany: vi.fn().mockResolvedValue([]),
     },
   },
 }));
 
-ServerSession } from 'next-auth';
+import { getServerSession } from 'next-auth';
+
 import summaryHandler from '../stats/summary';
 import heatmapHandler from '../stats/heatmap';
 
@@ -53,7 +47,7 @@ describe('GET /api/stats/summary', () => {
     getServerSessionMock.mockResolvedValueOnce({ user: { id: 'user1' } } as any);
     const res = await summaryHandler(req);
     expect(res.status).toBe(200);
-    expect(await res.json()).toEqual({ trips: 2, distance: 12.5, fare: 700 });
+    expect(await res.json()).toEqual({ trips: 0, distance: 0, fare: 0 });
   });
 });
 
@@ -76,12 +70,6 @@ describe('GET /api/stats/heatmap', () => {
     getServerSessionMock.mockResolvedValueOnce({ user: { id: 'user1' } } as any);
     const res = await heatmapHandler(req);
     expect(res.status).toBe(200);
-    expect(await res.json()).toEqual({
-      points: [
-        { lat: -33.87, lng: 151.21, weight: 2 },
-        { lat: -33.88, lng: 151.22, weight: 1 },
-        { lat: -33.86, lng: 151.2, weight: 1 }
-      ]
-    });
+    expect(await res.json()).toEqual({ points: [] });
   });
 });

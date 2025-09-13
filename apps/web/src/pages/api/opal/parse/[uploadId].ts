@@ -10,8 +10,7 @@ const prisma = new PrismaClient();
 
 const paramsSchema = z.object({ uploadId: z.string() });
 const bodySchema = z.object({ type: z.enum(['csv', 'html']) });
-const warningSchema = z.object({ index: z.number(), message: z.string() });
-const responseSchema = z.object({ uploadId: z.string(), rowsParsed: z.number(), warnings: z.array(warningSchema) });
+const responseSchema = z.object({ uploadId: z.string() });
 
 export default async function handler(req: Request): Promise<Response> {
   if (req.method !== 'POST') {
@@ -30,44 +29,16 @@ export default async function handler(req: Request): Promise<Response> {
     }
     const key = `${user.id}/${uploadId}/${upload.filename}`;
     const fileUrl = presignDownload(key);
-    const rawRes = await fetch(fileUrl);
-    const raw = await rawRes.text();
 
-    const parser = await import('../../../../../../../packages/opal-parser/src');
-    const parseFn = body.type === 'html' ? parser.parseHTML : parser.parseCSV;
-    const { records, warnings } = parseFn(raw, {});
+    await inngest.send({
+      name: 'statements/uploaded',
+      data: { fileUrl, uploadId, userId: user.id, type: body.type },
 
-    if (records.length) {
-      await prisma.trip.createMany({
-        data: records.map((r: any) => ({
-          userId: user.id,
-          tapOnTime: r.tap_on_time ? new Date(r.tap_on_time) : null,
-          tapOffTime: r.tap_off_time ? new Date(r.tap_off_time) : null,
-          mode: r.line || null,
-          line: r.line || null,
-          originName: r.from_stop || null,
-          originLat: r.from_lat ?? null,
-          originLng: r.from_lng ?? null,
-          destName: r.to_stop || null,
-          destLat: r.to_lat ?? null,
-          destLng: r.to_lng ?? null,
-          fareCents: r.fare_cents ?? null,
-          defaultFare: r.is_default_fare ?? false,
-          source: uploadId,
-        })),
-      });
-    }
-
-    await prisma.opalUpload.update({
-      where: { id: uploadId },
-      data: { status: 'parsed', rowsParsed: records.length },
     });
 
-    await inngest.send({ name: 'statements/uploaded', data: { fileUrl } });
-
     return new Response(
-      JSON.stringify(responseSchema.parse({ uploadId, rowsParsed: records.length, warnings })),
-      { status: 200, headers: { 'content-type': 'application/json' } }
+      JSON.stringify(responseSchema.parse({ uploadId })),
+      { status: 202, headers: { 'content-type': 'application/json' } }
     );
   } catch (err: any) {
     return err instanceof Response
