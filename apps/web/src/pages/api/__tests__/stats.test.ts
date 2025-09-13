@@ -7,6 +7,21 @@ vi.mock('next-auth', () => ({
 vi.mock('next-auth/providers/email', () => ({ default: () => ({}) }), { virtual: true });
 vi.mock('next-auth/providers/google', () => ({ default: () => ({}) }), { virtual: true });
 
+vi.mock('../../../lib/prisma', () => ({
+  prisma: {
+    trip: {
+      aggregate: vi.fn().mockResolvedValue({
+        _count: { _all: 2 },
+        _sum: { distanceKm: 12.5, fareCents: 700 }
+      }),
+      findMany: vi.fn().mockResolvedValue([
+        { originLat: -33.87, originLng: 151.21, destLat: -33.88, destLng: 151.22 },
+        { originLat: -33.87, originLng: 151.21, destLat: -33.86, destLng: 151.2 }
+      ]),
+    },
+  },
+}));
+
 import { getServerSession } from 'next-auth';
 import summaryHandler from '../stats/summary';
 import heatmapHandler from '../stats/heatmap';

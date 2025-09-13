@@ -52,8 +52,12 @@ model Trip {
   line         String?
   originName   String?
   originStopId String?
+  originLat    Float?
+  originLng    Float?
   destName     String?
   destStopId   String?
+  destLat      Float?
+  destLng      Float?
   fareCents    Int?
   defaultFare  Boolean  @default(false)
   distanceKm   Decimal? @db.Decimal(10,2)
