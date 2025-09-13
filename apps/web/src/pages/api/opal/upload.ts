@@ -1,11 +1,10 @@
 import { z } from 'zod';
 import { requireUser } from '../../../lib/auth';
 import { presignUpload } from '../../../lib/storage';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '../../../lib/prisma';
 
 export const config = { runtime: 'edge' };
 
-const prisma = new PrismaClient();
 
 const bodySchema = z.object({ filename: z.string(), mime: z.string() });
 const responseSchema = z.object({ uploadId: z.string(), url: z.string() });

@@ -1,12 +1,11 @@
 import { z } from 'zod';
 import { requireUser } from '../../../../lib/auth';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '../../../../lib/prisma';
 import { presignDownload } from '../../../../lib/storage';
 import { inngest } from '../../../../jobs';
 
 export const config = { runtime: 'edge' };
 
-const prisma = new PrismaClient();
 
 const paramsSchema = z.object({ uploadId: z.string() });
 const bodySchema = z.object({ type: z.enum(['csv', 'html']) });
