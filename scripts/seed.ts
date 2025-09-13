@@ -37,7 +37,7 @@ async function main() {
       const start = new Date(now - i * 86400000 + 8 * 3600000); // 8AM each day
       const end = new Date(start.getTime() + 45 * 60000); // 45 mins later
       await client.query(
-        `INSERT INTO trips (user_id, origin_stop_id, origin_lat, origin_lng, destination_stop_id, dest_lat, dest_lng, mode, start_time, end_time, fare_cents)
+        `INSERT INTO "Trip" ("userId", "originStopId", "originLat", "originLng", "destStopId", "destLat", "destLng", "mode", "tapOnTime", "tapOffTime", "fareCents")
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
         [
           userId,
