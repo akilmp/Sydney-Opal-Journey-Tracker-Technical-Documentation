@@ -17,6 +17,7 @@ export default async function handler(req: Request): Promise<Response> {
   try {
     const user = await requireUser(req);
     const agg = await prisma.trip.aggregate({
+
       where: { userId: user.id },
       _count: { _all: true },
       _sum: { distanceKm: true, fareCents: true },

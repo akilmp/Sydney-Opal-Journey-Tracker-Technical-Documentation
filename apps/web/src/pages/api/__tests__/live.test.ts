@@ -1,4 +1,11 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+
+vi.mock('next-auth', () => ({
+  default: () => ({}),
+  getServerSession: vi.fn(),
+}), { virtual: true });
+vi.mock('next-auth/providers/email', () => ({ default: () => ({}) }), { virtual: true });
+vi.mock('next-auth/providers/google', () => ({ default: () => ({}) }), { virtual: true });
 
 vi.mock('next-auth', () => ({
   default: () => ({}),
