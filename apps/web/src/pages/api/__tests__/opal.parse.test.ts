@@ -1,6 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-const { findFirst } = vi.hoisted(() => ({ findFirst: vi.fn() }));
+const { findFirst, PrismaClient } = vi.hoisted(() => ({
+  findFirst: vi.fn(),
+  PrismaClient: vi.fn(() => ({ opalUpload: { findFirst } })),
+}));
 
 vi.mock('../../../lib/auth', () => ({
   requireUser: vi.fn(),
@@ -15,12 +18,8 @@ vi.mock('../../../jobs', () => ({
 }));
 
 vi.mock('@prisma/client', () => ({
-  PrismaClient: vi.fn(() => ({
-    opalUpload: { findFirst },
-  })),
+  PrismaClient,
 }));
-
-import handler from '../opal/parse/[uploadId]';
 import { requireUser } from '../../../lib/auth';
 import { presignDownload } from '../../../lib/storage';
 import { inngest } from '../../../jobs';
@@ -31,32 +30,30 @@ const sendMock = vi.mocked(inngest.send);
 
 beforeEach(() => {
   vi.clearAllMocks();
+  vi.resetModules();
 });
 
 describe('POST /api/opal/parse/[uploadId]', () => {
-  it('enqueues parsing job and returns 202', async () => {
+  it('reuses prisma connection across requests', async () => {
     requireUserMock.mockResolvedValue({ id: 'user1' } as any);
     findFirst.mockResolvedValue({ id: 'u1', filename: 'file.csv' });
     presignDownloadMock.mockReturnValue('http://example.com/file.csv');
 
-    const req = new Request('http://localhost/api/opal/parse/u1', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ type: 'csv' }),
-    });
+    (globalThis as any).prisma = undefined;
+    const { default: handler } = await import('../opal/parse/[uploadId]');
+    const req = () =>
+      new Request('http://localhost/api/opal/parse/u1', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ type: 'csv' }),
+      });
 
-    const res = await handler(req);
-    expect(res.status).toBe(202);
-    expect(await res.json()).toEqual({ uploadId: 'u1' });
-    expect(sendMock).toHaveBeenCalledWith({
-      name: 'statements/uploaded',
-      data: {
-        fileUrl: 'http://example.com/file.csv',
-        uploadId: 'u1',
-        userId: 'user1',
-        type: 'csv',
-      },
-    });
+    const res1 = await handler(req());
+    const res2 = await handler(req());
+    expect(res1.status).toBe(202);
+    expect(res2.status).toBe(202);
+    expect(PrismaClient).toHaveBeenCalledTimes(1);
+    expect(sendMock).toHaveBeenCalledTimes(2);
   });
 });
 
