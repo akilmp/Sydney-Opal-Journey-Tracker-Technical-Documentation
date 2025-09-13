@@ -5,6 +5,13 @@ vi.mock('../../../lib/transportNSW', () => ({
   getDepartures: vi.fn().mockResolvedValue([]),
 }));
 
+vi.mock('next-auth', () => ({
+  default: () => ({}),
+  getServerSession: vi.fn(),
+}), { virtual: true });
+vi.mock('next-auth/providers/email', () => ({ default: () => ({}) }), { virtual: true });
+vi.mock('next-auth/providers/google', () => ({ default: () => ({}) }), { virtual: true });
+
 import { getServerSession } from 'next-auth';
 import alertsHandler from '../live/alerts';
 import departuresHandler from '../live/departures';
@@ -30,6 +37,7 @@ describe('GET /api/live/alerts', () => {
     const req = new Request(`${base}/api/live/alerts`, {
       headers: { 'x-user-id': 'user1' }
     });
+    getServerSessionMock.mockResolvedValueOnce({ user: { id: 'user1' } } as any);
     const res = await alertsHandler(req);
     expect(res.status).toBe(400);
   });
@@ -44,6 +52,7 @@ describe('GET /api/live/alerts', () => {
     const req = new Request(`${base}/api/live/alerts?routeId=1&line=T1`, {
       headers: { 'x-user-id': 'user1' }
     });
+    getServerSessionMock.mockResolvedValueOnce({ user: { id: 'user1' } } as any);
     const res = await alertsHandler(req);
     expect(res.status).toBe(200);
     expect(await res.json()).toEqual({ alerts: [] });
@@ -57,6 +66,7 @@ describe('GET /api/live/alerts', () => {
     const req = new Request(`${base}/api/live/alerts?routeId=1`, {
       headers: { 'x-user-id': 'user1' }
     });
+    getServerSessionMock.mockResolvedValueOnce({ user: { id: 'user1' } } as any);
     const res = await alertsHandler(req);
     expect(res.status).toBe(503);
   });
@@ -68,6 +78,7 @@ describe('GET /api/live/alerts', () => {
     const req = new Request(`${base}/api/live/alerts?routeId=1`, {
       headers: { 'x-user-id': 'user1' }
     });
+    getServerSessionMock.mockResolvedValueOnce({ user: { id: 'user1' } } as any);
     const res = await alertsHandler(req);
     expect(res.status).toBe(503);
   });
